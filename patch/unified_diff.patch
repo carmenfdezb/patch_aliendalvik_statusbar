@@ -1,0 +1,144 @@
+--- /dev/null
++++ b/usr/share/lipstick-jolla-home-qt5/statusarea/AlienDalvikIndicator.qml
+@@ -0,0 +1,128 @@
++import QtQuick 2.2
++import Nemo.DBus 2.0
++import Sailfish.Silica 1.0
++
++Image {
++    id: root
++
++    property bool alienDalvikRunning
++
++    DBusInterface {
++        id: androidConfiguration
++
++        bus: DBus.SystemBus
++        service: "com.myriadgroup.alien.settings"
++        path: "/com/myriadgroup/alien/settings"
++        iface: "com.myriadgroup.alien.settings"
++        signalsEnabled: true
++
++        function nativeContactsAccessChanged(allowed) {
++            contactAccess.checked = allowed
++        }
++    }
++
++    DBusInterface {
++        id: apkInterface
++
++        bus: DBus.SystemBus
++        service: "com.jolla.apkd"
++        path: "/com/jolla/apkd"
++        iface: "com.jolla.apkd"
++    }
++
++    DBusInterface {
++        id: dalvikService
++
++        bus: DBus.SystemBus
++        service: "org.freedesktop.systemd1"
++        iface: "org.freedesktop.systemd1.Unit"
++        signalsEnabled: true
++
++        function updateProperties() {
++            if (path !== "") {
++                root.alienDalvikRunning = dalvikService.getProperty("ActiveState") === "active"
++            } else {
++                root.alienDalvikRunning = false
++            }
++        }
++
++        onPropertiesChanged: runningUpdateTimer.start()
++        onPathChanged: updateProperties()
++    }
++
++    DBusInterface {
++        id: manager
++
++        bus: DBus.SystemBus
++        service: "org.freedesktop.systemd1"
++        path: "/org/freedesktop/systemd1"
++        iface: "org.freedesktop.systemd1.Manager"
++        signalsEnabled: true
++
++        signal unitNew(string name)
++        onUnitNew: {
++            if (name == "aliendalvik.service") {
++                pathUpdateTimer.start()
++            }
++        }
++
++        signal unitRemoved(string name)
++        onUnitRemoved: {
++            if (name == "aliendalvik.service") {
++                dalvikService.path = ""
++                pathUpdateTimer.stop()
++            }
++        }
++
++        Component.onCompleted: {
++            updatePath()
++            var alienDalvik = Qt.createQmlObject("import com.jolla.apkd 1.0")
++        }
++
++
++        function updatePath() {
++            manager.typedCall("GetUnit", [{ "type": "s", "value": "aliendalvik.service"}], function(unit) {
++                dalvikService.path = unit
++            }, function() {
++                dalvikService.path = ""
++            })
++        }
++    }
++
++    Timer {
++        // starting and stopping can result in lots of property changes
++        id: runningUpdateTimer
++        interval: 100
++        onTriggered: dalvikService.updateProperties()
++    }
++
++    Timer {
++        // stopping service can result in unit appearing and disappering, for some reason.
++        id: pathUpdateTimer
++        interval: 100
++        onTriggered: manager.updatePath()
++    }
++    source: "/usr/share/patchmanager/patches/aliendalvik-statusbar/icon-s-dalvik.svg"
++
++    layer.enabled: true
++    layer.samplerName: "source"
++    layer.effect: ShaderEffect {
++    property color color: lipstickSettings.lowPowerMode ? Theme.highlightColor : Theme.primaryColor
++    fragmentShader: "
++        uniform sampler2D source;
++        uniform highp vec4 color;
++        uniform lowp float qt_Opacity;
++        varying highp vec2 qt_TexCoord0;
++        void main(void)
++        {
++            highp vec4 pixelColor = texture2D(source, qt_TexCoord0);
++            lowp float gray = dot(pixelColor.rgb, vec3(0.299, 0.587, 0.114));
++                gl_FragColor = vec4(color.rgb * gray, pixelColor.a) * qt_Opacity;
++        }
++        "
++    }
++    width: source != "" ? implicitWidth : 0
++    height: source != "" ? implicitHeight : 0
++
++    visible: root.alienDalvikRunning
++}
+--- a/usr/share/lipstick-jolla-home-qt5/statusarea/StatusArea.qml
++++ b/usr/share/lipstick-jolla-home-qt5/statusarea/StatusArea.qml
+@@ -68,6 +68,10 @@
+             AlarmStatusIndicator {
+                 anchors.verticalCenter: parent.verticalCenter
+             }
++            
++            AlienDalvikIndicator {
++                anchors.verticalCenter: parent.verticalCenter
++            }
+ 
+             //XXX Headset indicator
+             //XXX Call forwarding indicator
