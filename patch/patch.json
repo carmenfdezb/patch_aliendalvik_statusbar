@@ -1,6 +1,6 @@
 {
     "name": "Aliendalvik statusbar",
-    "description": "Show aliendalvik icon in statusbar when ad is running",
+    "description": "Shows aliendalvik icon in statusbar when ad is running",
     "category": "homescreen",
 	"infos": {
         "maintainer": "carmenfdezb"
