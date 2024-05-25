@@ -131,13 +131,13 @@
 +}
 --- a/usr/share/lipstick-jolla-home-qt5/statusarea/StatusArea.qml
 +++ b/usr/share/lipstick-jolla-home-qt5/statusarea/StatusArea.qml
-@@ -68,6 +68,10 @@
+@@ -83,6 +83,10 @@
              AlarmStatusIndicator {
                  anchors.verticalCenter: parent.verticalCenter
              }
 +            
 +            AlienDalvikIndicator {
-+                anchors.verticalCenter: parent.verticalCenter
++				anchors.verticalCenter: parent.verticalCenter
 +            }
  
              //XXX Headset indicator
