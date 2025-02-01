@@ -1,9 +1,10 @@
 --- /dev/null
 +++ b/usr/share/lipstick-jolla-home-qt5/statusarea/AlienDalvikIndicator.qml
-@@ -0,0 +1,128 @@
+@@ -0,0 +1,129 @@
 +import QtQuick 2.2
 +import Nemo.DBus 2.0
 +import Sailfish.Silica 1.0
++import com.jolla.apkd 1.0
 +
 +Image {
 +    id: root
@@ -64,14 +65,14 @@
 +
 +        signal unitNew(string name)
 +        onUnitNew: {
-+            if (name == "aliendalvik.service") {
++            if (name == AppUtils.serviceName) {
 +                pathUpdateTimer.start()
 +            }
 +        }
 +
 +        signal unitRemoved(string name)
 +        onUnitRemoved: {
-+            if (name == "aliendalvik.service") {
++            if (name == AppUtils.serviceName) {
 +                dalvikService.path = ""
 +                pathUpdateTimer.stop()
 +            }
@@ -84,7 +85,7 @@
 +
 +
 +        function updatePath() {
-+            manager.typedCall("GetUnit", [{ "type": "s", "value": "aliendalvik.service"}], function(unit) {
++            manager.typedCall("GetUnit", [{ "type": "s", "value": AppUtils.serviceName}], function(unit) {
 +                dalvikService.path = unit
 +            }, function() {
 +                dalvikService.path = ""
@@ -138,7 +139,7 @@
 +            
 +            AlienDalvikIndicator {
 +				anchors.verticalCenter: parent.verticalCenter
-+            }
++			}
  
              //XXX Headset indicator
              //XXX Call forwarding indicator
