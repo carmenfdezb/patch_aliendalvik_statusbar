@@ -1,6 +1,6 @@
 --- /dev/null
 +++ b/usr/share/lipstick-jolla-home-qt5/statusarea/AlienDalvikIndicator.qml
-@@ -0,0 +1,129 @@
+@@ -0,0 +1,139 @@
 +import QtQuick 2.2
 +import Nemo.DBus 2.0
 +import Sailfish.Silica 1.0
@@ -106,6 +106,14 @@
 +        interval: 100
 +        onTriggered: manager.updatePath()
 +    }
++    
++    //Only added to use batteryStatusIndicator
++    Icon {
++		id: batteryStatusIndicator
++        source: "image://theme/icon-status-battery"
++        visible: false
++    }
++
 +    source: "/usr/share/patchmanager/patches/aliendalvik-statusbar/icon-s-dalvik.svg"
 +
 +    layer.enabled: true
@@ -125,8 +133,10 @@
 +        }
 +        "
 +    }
-+    width: source != "" ? implicitWidth : 0
-+    height: source != "" ? implicitHeight : 0
++    height: source != "" ? batteryStatusIndicator.height : 0  //This ensure that height icon matches that of the battery icon 
++    width: height
++    
++    fillMode: Image.PreserveAspectFit
 +
 +    visible: root.alienDalvikRunning
 +}
