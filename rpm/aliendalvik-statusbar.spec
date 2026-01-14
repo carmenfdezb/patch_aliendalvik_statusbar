@@ -3,7 +3,7 @@ Name:       aliendalvik-statusbar
 BuildArch: noarch
 
 Summary:    Aliendalvik statusbar
-Version:    1.1
+Version:    1.2
 Release:    1
 Group:      Qt/Qt
 License:    WTFPL
@@ -39,6 +39,9 @@ fi
 %{_datadir}/patchmanager/patches/%{name}
 
 %changelog
+* Tue Jan 13 2026 Carmen Fdez. B. 1.2-1
+- Support for Jolla C2
+
 * Sat Feb 01 2025 Carmen Fdez. B. 1.1-1
 - Support sfos 5
 
